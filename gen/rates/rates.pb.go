@@ -25,8 +25,8 @@ const (
 type GetRatesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Method        string                 `protobuf:"bytes,1,opt,name=method,proto3" json:"method,omitempty"`
-	N             int32                  `protobuf:"varint,2,opt,name=n,proto3" json:"n,omitempty"`
-	M             int32                  `protobuf:"varint,3,opt,name=m,proto3" json:"m,omitempty"`
+	PositionFrom  int32                  `protobuf:"varint,2,opt,name=position_from,json=positionFrom,proto3" json:"position_from,omitempty"`
+	PositionTo    int32                  `protobuf:"varint,3,opt,name=position_to,json=positionTo,proto3" json:"position_to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,16 +68,16 @@ func (x *GetRatesRequest) GetMethod() string {
 	return ""
 }
 
-func (x *GetRatesRequest) GetN() int32 {
+func (x *GetRatesRequest) GetPositionFrom() int32 {
 	if x != nil {
-		return x.N
+		return x.PositionFrom
 	}
 	return 0
 }
 
-func (x *GetRatesRequest) GetM() int32 {
+func (x *GetRatesRequest) GetPositionTo() int32 {
 	if x != nil {
-		return x.M
+		return x.PositionTo
 	}
 	return 0
 }
@@ -226,11 +226,12 @@ var File_proto_rates_rates_proto protoreflect.FileDescriptor
 
 const file_proto_rates_rates_proto_rawDesc = "" +
 	"\n" +
-	"\x17proto/rates/rates.proto\x12\x05rates\x1a\x1fgoogle/protobuf/timestamp.proto\"E\n" +
+	"\x17proto/rates/rates.proto\x12\x05rates\x1a\x1fgoogle/protobuf/timestamp.proto\"o\n" +
 	"\x0fGetRatesRequest\x12\x16\n" +
-	"\x06method\x18\x01 \x01(\tR\x06method\x12\f\n" +
-	"\x01n\x18\x02 \x01(\x05R\x01n\x12\f\n" +
-	"\x01m\x18\x03 \x01(\x05R\x01m\"p\n" +
+	"\x06method\x18\x01 \x01(\tR\x06method\x12#\n" +
+	"\rposition_from\x18\x02 \x01(\x05R\fpositionFrom\x12\x1f\n" +
+	"\vposition_to\x18\x03 \x01(\x05R\n" +
+	"positionTo\"p\n" +
 	"\x10GetRatesResponse\x12\x10\n" +
 	"\x03ask\x18\x01 \x01(\x03R\x03ask\x12\x10\n" +
 	"\x03bid\x18\x02 \x01(\x03R\x03bid\x128\n" +
@@ -240,7 +241,7 @@ const file_proto_rates_rates_proto_rawDesc = "" +
 	"\x02ok\x18\x01 \x01(\bR\x02ok2\x91\x01\n" +
 	"\fRatesService\x12;\n" +
 	"\bGetRates\x12\x16.rates.GetRatesRequest\x1a\x17.rates.GetRatesResponse\x12D\n" +
-	"\vHealthCheck\x12\x19.rates.HealthCheckRequest\x1a\x1a.rates.HealthCheckResponseB/Z-github.com/approachi/grinex-rates/proto/ratesb\x06proto3"
+	"\vHealthCheck\x12\x19.rates.HealthCheckRequest\x1a\x1a.rates.HealthCheckResponseB-Z+github.com/approachi/grinex-rates/gen/ratesb\x06proto3"
 
 var (
 	file_proto_rates_rates_proto_rawDescOnce sync.Once
