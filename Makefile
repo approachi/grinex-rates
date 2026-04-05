@@ -4,11 +4,14 @@ build:
 
 .PHONY: test-unit
 test-unit:
-	go test ./internal/... -v
+	go test -count=1 ./internal/... -v
 
 .PHONY: test-integration
 test-integration:
-	go test ./tests/integration/... -v
+	docker-compose -f docker-compose.test.yml up -d
+	docker-compose -f docker-compose.test.yml wait migrator-test
+	go test -count=1 ./tests/integration/... -v; \
+	docker-compose -f docker-compose.test.yml down
 
 .PHONY: test
 test: test-unit test-integration

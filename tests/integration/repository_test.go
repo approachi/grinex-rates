@@ -12,7 +12,7 @@ import (
 	"github.com/approachi/grinex-rates/internal/repository/postgres"
 )
 
-func TestRepository_Save(t *testing.T) {
+func TestRepository_ShouldPersistRate_WhenSave(t *testing.T) {
 	pool := newTestPool(t)
 	truncateRates(t, pool)
 
@@ -39,7 +39,7 @@ func TestRepository_Save(t *testing.T) {
 	assert.WithinDuration(t, rate.CreatedAt, createdAt, time.Second)
 }
 
-func TestRepository_SaveMultiple(t *testing.T) {
+func TestRepository_ShouldPersistAllRates_WhenSaveMultiple(t *testing.T) {
 	pool := newTestPool(t)
 	truncateRates(t, pool)
 

@@ -13,7 +13,7 @@ func dbURL() string {
 	if url := os.Getenv("TEST_DATABASE_URL"); url != "" {
 		return url
 	}
-	return "host=localhost port=5432 user=postgres password=postgres dbname=grinex sslmode=disable"
+	return "host=localhost port=5433 user=postgres password=postgres dbname=grinex_test sslmode=disable"
 }
 
 func newTestPool(t *testing.T) *pgxpool.Pool {

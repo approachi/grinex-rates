@@ -36,7 +36,7 @@ func defaultMockClient() *mockExchangeClient {
 	}
 }
 
-func TestService_GetRates_TopN(t *testing.T) {
+func TestService_ShouldReturnRate_WhenTopNMethod(t *testing.T) {
 	pool := newTestPool(t)
 	truncateRates(t, pool)
 
@@ -55,7 +55,7 @@ func TestService_GetRates_TopN(t *testing.T) {
 	assert.Equal(t, 1, count)
 }
 
-func TestService_GetRates_AvgNM(t *testing.T) {
+func TestService_ShouldReturnRate_WhenAvgNMMethod(t *testing.T) {
 	pool := newTestPool(t)
 	truncateRates(t, pool)
 
@@ -68,7 +68,7 @@ func TestService_GetRates_AvgNM(t *testing.T) {
 	assert.Equal(t, int64(7800), rate.Bid)
 }
 
-func TestService_GetRates_UnknownMethod(t *testing.T) {
+func TestService_ShouldReturnError_WhenUnknownMethod(t *testing.T) {
 	pool := newTestPool(t)
 
 	svc := service.NewRatesService(defaultMockClient(), postgres.NewRepository(pool))

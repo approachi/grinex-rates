@@ -9,7 +9,7 @@ import (
 	"github.com/approachi/grinex-rates/internal/domain"
 )
 
-func TestTopN(t *testing.T) {
+func TestTopN_ShouldReturnPriceAtPosition_WhenValidInput(t *testing.T) {
 	entries := []domain.OrderBookEntry{
 		{Price: 100},
 		{Price: 200},
@@ -46,7 +46,7 @@ func TestTopN(t *testing.T) {
 	})
 }
 
-func TestAvgNM(t *testing.T) {
+func TestAvgNM_ShouldReturnAveragePrice_WhenValidRange(t *testing.T) {
 	entries := []domain.OrderBookEntry{
 		{Price: 100},
 		{Price: 200},

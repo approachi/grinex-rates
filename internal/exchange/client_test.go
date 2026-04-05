@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParsePrice(t *testing.T) {
+func TestParsePrice_ShouldConvertDecimalToMinorUnits_WhenDecimalString(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected int64
