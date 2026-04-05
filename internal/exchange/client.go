@@ -30,7 +30,7 @@ type Client struct {
 	http *resty.Client
 }
 
-func New() *Client {
+func NewClient() *Client {
 	return &Client{
 		http: resty.New(),
 	}
