@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	pb "github.com/approachi/grinex-rates/gen/rates"
 )
@@ -17,6 +18,7 @@ type Server struct {
 func NewServer(handler *Handler, port int) *Server {
 	srv := grpc.NewServer()
 	pb.RegisterRatesServiceServer(srv, handler)
+	reflection.Register(srv)
 
 	return &Server{
 		grpc: srv,
