@@ -9,6 +9,7 @@ import (
 	"github.com/approachi/grinex-rates/internal/calculator"
 	"github.com/approachi/grinex-rates/internal/domain"
 	"github.com/approachi/grinex-rates/internal/exchange"
+	"github.com/approachi/grinex-rates/internal/observability/metrics"
 	"github.com/approachi/grinex-rates/internal/observability/tracing"
 	"github.com/approachi/grinex-rates/internal/repository"
 )
@@ -65,6 +66,9 @@ func (s *ratesService) GetRates(ctx context.Context, method string, positionFrom
 		tracing.RecordError(span, err)
 		return domain.Rate{}, err
 	}
+
+	metrics.RatesAsk.Set(float64(rate.Ask))
+	metrics.RatesBid.Set(float64(rate.Bid))
 
 	return rate, nil
 }

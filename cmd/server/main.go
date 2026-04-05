@@ -13,6 +13,7 @@ import (
 	"github.com/approachi/grinex-rates/internal/exchange"
 	grpcserver "github.com/approachi/grinex-rates/internal/grpc"
 	"github.com/approachi/grinex-rates/internal/observability/logger"
+	"github.com/approachi/grinex-rates/internal/observability/metrics"
 	"github.com/approachi/grinex-rates/internal/observability/tracing"
 	"github.com/approachi/grinex-rates/internal/repository/postgres"
 	"github.com/approachi/grinex-rates/internal/service"
@@ -30,7 +31,8 @@ func main() {
 	}
 	defer zapLogger.Sync()
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	tp, err := tracing.NewTracerProvider(ctx, cfg.Tracing.Endpoint)
 	if err != nil {
@@ -38,6 +40,14 @@ func main() {
 	} else {
 		defer tp.Shutdown(ctx)
 	}
+
+	metrics.Register()
+	go func() {
+		zapLogger.Info("starting metrics server", zap.Int("port", cfg.Metrics.Port))
+		if err := metrics.RunServer(ctx, cfg.Metrics.Port); err != nil {
+			zapLogger.Warn("metrics server stopped", zap.Error(err))
+		}
+	}()
 
 	pool, err := postgres.NewPool(ctx, cfg.Postgres)
 	if err != nil {
