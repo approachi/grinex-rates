@@ -1,0 +1,27 @@
+package exchange
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestParsePrice(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"80.85", 8085},
+		{"80.00", 8000},
+		{"80.9", 8090},
+		{"80", 8000},
+		{"0.01", 1},
+		{"100.99", 10099},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			assert.Equal(t, tt.expected, parsePrice(tt.input))
+		})
+	}
+}
