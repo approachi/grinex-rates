@@ -26,17 +26,17 @@ type orderEntry struct {
 	Volume string `json:"volume"`
 }
 
-type Client struct {
+type GrinexClient struct {
 	http *resty.Client
 }
 
-func NewClient() *Client {
-	return &Client{
+func NewGrinexClient() *GrinexClient {
+	return &GrinexClient{
 		http: resty.New(),
 	}
 }
 
-func (c *Client) FetchOrderBook(ctx context.Context) (asks, bids []domain.OrderBookEntry, err error) {
+func (c *GrinexClient) FetchOrderBook(ctx context.Context) (asks, bids []domain.OrderBookEntry, err error) {
 	var resp depthResponse
 
 	_, err = c.http.R().

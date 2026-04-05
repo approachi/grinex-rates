@@ -23,11 +23,11 @@ const (
 var tracer = otel.Tracer("service")
 
 type ratesService struct {
-	client *exchange.Client
+	client exchange.Client
 	repo   repository.RatesRepository
 }
 
-func NewRatesService(client *exchange.Client, repo repository.RatesRepository) RatesService {
+func NewRatesService(client exchange.Client, repo repository.RatesRepository) RatesService {
 	return &ratesService{
 		client: client,
 		repo:   repo,
