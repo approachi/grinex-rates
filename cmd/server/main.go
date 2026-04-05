@@ -13,6 +13,7 @@ import (
 	"github.com/approachi/grinex-rates/internal/exchange"
 	grpcserver "github.com/approachi/grinex-rates/internal/grpc"
 	"github.com/approachi/grinex-rates/internal/observability/logger"
+	"github.com/approachi/grinex-rates/internal/observability/tracing"
 	"github.com/approachi/grinex-rates/internal/repository/postgres"
 	"github.com/approachi/grinex-rates/internal/service"
 )
@@ -30,6 +31,13 @@ func main() {
 	defer zapLogger.Sync()
 
 	ctx := context.Background()
+
+	tp, err := tracing.NewTracerProvider(ctx, cfg.Tracing.Endpoint)
+	if err != nil {
+		zapLogger.Warn("failed to init tracer, tracing disabled", zap.Error(err))
+	} else {
+		defer tp.Shutdown(ctx)
+	}
 
 	pool, err := postgres.NewPool(ctx, cfg.Postgres)
 	if err != nil {

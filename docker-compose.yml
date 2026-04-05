@@ -31,11 +31,20 @@ services:
     command: ["./server"]
     environment:
       APP_POSTGRES_HOST: postgres
+      APP_TRACING_ENDPOINT: jaeger:4318
     ports:
       - "50051:50051"
     depends_on:
       migrator:
         condition: service_completed_successfully
+      jaeger:
+        condition: service_started
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+      - "4318:4318"
 
   prometheus:
     image: prom/prometheus:v3.3.1

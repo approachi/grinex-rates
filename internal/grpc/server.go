@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
@@ -16,7 +17,9 @@ type Server struct {
 }
 
 func NewServer(handler *Handler, port int) *Server {
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
+	)
 	pb.RegisterRatesServiceServer(srv, handler)
 	reflection.Register(srv)
 

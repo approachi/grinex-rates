@@ -4,9 +4,12 @@ import (
 	"context"
 	"time"
 
+	"go.opentelemetry.io/otel"
+
 	"github.com/approachi/grinex-rates/internal/calculator"
 	"github.com/approachi/grinex-rates/internal/domain"
 	"github.com/approachi/grinex-rates/internal/exchange"
+	"github.com/approachi/grinex-rates/internal/observability/tracing"
 	"github.com/approachi/grinex-rates/internal/repository"
 )
 
@@ -15,6 +18,8 @@ const (
 	MethodTopN  = "topN"
 	MethodAvgNM = "avgNM"
 )
+
+var tracer = otel.Tracer("service")
 
 type ratesService struct {
 	client *exchange.Client
@@ -29,18 +34,24 @@ func NewRatesService(client *exchange.Client, repo repository.RatesRepository) R
 }
 
 func (s *ratesService) GetRates(ctx context.Context, method string, positionFrom, positionTo int) (domain.Rate, error) {
-	asks, bids, err := s.client.FetchOrderBook(ctx)
+	ctx, span := tracer.Start(ctx, "service.GetRates")
+	defer span.End()
+
+	asks, bids, err := s.fetchOrderBook(ctx)
 	if err != nil {
+		tracing.RecordError(span, err)
 		return domain.Rate{}, err
 	}
 
 	ask, err := calculate(method, asks, positionFrom, positionTo)
 	if err != nil {
+		tracing.RecordError(span, err)
 		return domain.Rate{}, err
 	}
 
 	bid, err := calculate(method, bids, positionFrom, positionTo)
 	if err != nil {
+		tracing.RecordError(span, err)
 		return domain.Rate{}, err
 	}
 
@@ -51,10 +62,22 @@ func (s *ratesService) GetRates(ctx context.Context, method string, positionFrom
 	}
 
 	if err := s.repo.Save(ctx, rate); err != nil {
+		tracing.RecordError(span, err)
 		return domain.Rate{}, err
 	}
 
 	return rate, nil
+}
+
+func (s *ratesService) fetchOrderBook(ctx context.Context) (asks, bids []domain.OrderBookEntry, err error) {
+	ctx, span := tracer.Start(ctx, "exchange.FetchOrderBook")
+	defer span.End()
+
+	asks, bids, err = s.client.FetchOrderBook(ctx)
+	if err != nil {
+		tracing.RecordError(span, err)
+	}
+	return
 }
 
 func calculate(method string, entries []domain.OrderBookEntry, positionFrom, positionTo int) (int64, error) {
