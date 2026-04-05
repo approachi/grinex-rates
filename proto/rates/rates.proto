@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package rates;
+
+option go_package = "github.com/approachi/grinex-rates/gen/rates";
+
+import "google/protobuf/timestamp.proto";
+
+service RatesService {
+  rpc GetRates(GetRatesRequest) returns (GetRatesResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message GetRatesRequest {
+  string method = 1;
+  int32 position_from = 2;
+  int32 position_to = 3;
+}
+
+message GetRatesResponse {
+  int64 ask = 1;
+  int64 bid = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  bool ok = 1;
+}
