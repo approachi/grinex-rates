@@ -56,7 +56,7 @@ func main() {
 	defer pool.Close()
 
 	repo := postgres.NewRepository(pool)
-	client := exchange.NewGrinexClient()
+	client := exchange.NewGrinexClient(cfg.Exchange.TimeoutSeconds)
 	svc := service.NewRatesService(client, repo)
 	handler := grpcserver.NewHandler(svc)
 	srv := grpcserver.NewServer(handler, cfg.GRPC.Port)

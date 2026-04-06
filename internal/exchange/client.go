@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 
@@ -31,9 +32,9 @@ type GrinexClient struct {
 	http *resty.Client
 }
 
-func NewGrinexClient() *GrinexClient {
+func NewGrinexClient(timeoutSeconds int) *GrinexClient {
 	return &GrinexClient{
-		http: resty.New(),
+		http: resty.New().SetTimeout(time.Duration(timeoutSeconds) * time.Second),
 	}
 }
 

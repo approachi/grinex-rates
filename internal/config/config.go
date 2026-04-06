@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -10,6 +11,7 @@ import (
 type Config struct {
 	GRPC     GRPCConfig
 	Postgres PostgresConfig
+	Exchange ExchangeConfig
 	Metrics  MetricsConfig
 	Tracing  TracingConfig
 	Log      LogConfig
@@ -26,6 +28,10 @@ type PostgresConfig struct {
 	Password string
 	Database string
 	SSLMode  string
+}
+
+type ExchangeConfig struct {
+	TimeoutSeconds int
 }
 
 type MetricsConfig struct {
@@ -50,6 +56,7 @@ func Load() (*Config, error) {
 	pflag.String("postgres-password", "", "PostgreSQL password")
 	pflag.String("postgres-database", "", "PostgreSQL database name")
 	pflag.String("postgres-sslmode", "", "PostgreSQL SSL mode (disable|require|verify-full)")
+	pflag.Int("exchange-timeout", 0, "Exchange HTTP client timeout in seconds")
 	pflag.Int("metrics-port", 0, "Prometheus metrics server port")
 	pflag.String("tracing-endpoint", "", "OpenTelemetry collector endpoint")
 	pflag.String("log-level", "", "Log level (debug, info, warn, error)")
@@ -65,6 +72,10 @@ func Load() (*Config, error) {
 		}
 	}
 
+	v.SetEnvPrefix("APP")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
+
 	// Bind each flag explicitly to its viper key.
 	// Priority: flag > config file
 	for _, pair := range [][2]string{
@@ -75,6 +86,7 @@ func Load() (*Config, error) {
 		{"postgres.password", "postgres-password"},
 		{"postgres.database", "postgres-database"},
 		{"postgres.sslmode", "postgres-sslmode"},
+		{"exchange.timeoutseconds", "exchange-timeout"},
 		{"metrics.port", "metrics-port"},
 		{"tracing.endpoint", "tracing-endpoint"},
 		{"log.level", "log-level"},
@@ -108,6 +120,7 @@ func validate(cfg *Config) error {
 		{"postgres.password", cfg.Postgres.Password != ""},
 		{"postgres.database", cfg.Postgres.Database != ""},
 		{"postgres.sslmode", cfg.Postgres.SSLMode != ""},
+		{"exchange.timeoutseconds", cfg.Exchange.TimeoutSeconds != 0},
 		{"metrics.port", cfg.Metrics.Port != 0},
 		{"tracing.endpoint", cfg.Tracing.Endpoint != ""},
 		{"log.level", cfg.Log.Level != ""},
