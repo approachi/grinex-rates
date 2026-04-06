@@ -6,7 +6,7 @@ build:
 test-integration:
 	docker-compose -f docker-compose.test.yml up -d
 	docker-compose -f docker-compose.test.yml wait migrator-test
-	go test -count=1 ./tests/integration/... -v; \
+	go test -count=1 -tags integration ./tests/integration/... -v; \
 	docker-compose -f docker-compose.test.yml down
 
 .PHONY: test
