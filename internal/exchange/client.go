@@ -2,6 +2,7 @@ package exchange
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -37,31 +38,45 @@ func NewGrinexClient() *GrinexClient {
 }
 
 func (c *GrinexClient) FetchOrderBook(ctx context.Context) (asks, bids []domain.OrderBookEntry, err error) {
-	var resp depthResponse
+	var result depthResponse
 
-	_, err = c.http.R().
+	resp, err := c.http.R().
 		SetContext(ctx).
 		SetQueryParam("symbol", symbol).
-		SetResult(&resp).
+		SetResult(&result).
 		Get(grinexURL)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	asks = make([]domain.OrderBookEntry, len(resp.Asks))
-	for i, a := range resp.Asks {
-		asks[i] = domain.OrderBookEntry{
-			Price:  parsePrice(a.Price),
-			Volume: parsePrice(a.Volume),
-		}
+	if resp.IsError() {
+		return nil, nil, fmt.Errorf("exchange API returned status %d: %s", resp.StatusCode(), resp.String())
 	}
 
-	bids = make([]domain.OrderBookEntry, len(resp.Bids))
-	for i, b := range resp.Bids {
-		bids[i] = domain.OrderBookEntry{
-			Price:  parsePrice(b.Price),
-			Volume: parsePrice(b.Volume),
+	asks = make([]domain.OrderBookEntry, len(result.Asks))
+	for i, a := range result.Asks {
+		price, err := parsePrice(a.Price)
+		if err != nil {
+			return nil, nil, fmt.Errorf("ask[%d] price: %w", i, err)
 		}
+		volume, err := parsePrice(a.Volume)
+		if err != nil {
+			return nil, nil, fmt.Errorf("ask[%d] volume: %w", i, err)
+		}
+		asks[i] = domain.OrderBookEntry{Price: price, Volume: volume}
+	}
+
+	bids = make([]domain.OrderBookEntry, len(result.Bids))
+	for i, b := range result.Bids {
+		price, err := parsePrice(b.Price)
+		if err != nil {
+			return nil, nil, fmt.Errorf("bid[%d] price: %w", i, err)
+		}
+		volume, err := parsePrice(b.Volume)
+		if err != nil {
+			return nil, nil, fmt.Errorf("bid[%d] volume: %w", i, err)
+		}
+		bids[i] = domain.OrderBookEntry{Price: price, Volume: volume}
 	}
 
 	return asks, bids, nil
@@ -69,10 +84,13 @@ func (c *GrinexClient) FetchOrderBook(ctx context.Context) (asks, bids []domain.
 
 // parsePrice converts a decimal string to int64 in minor units (cents).
 // Example: "80.85" -> 8085
-func parsePrice(s string) int64 {
+func parsePrice(s string) (int64, error) {
 	parts := strings.SplitN(s, ".", 2)
 
-	intPart, _ := strconv.ParseInt(parts[0], 10, 64)
+	intPart, err := strconv.ParseInt(parts[0], 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("invalid integer part %q: %w", parts[0], err)
+	}
 	result := intPart * precision
 
 	if len(parts) == 2 {
@@ -81,9 +99,12 @@ func parsePrice(s string) int64 {
 			dec += "0"
 		}
 		dec = dec[:2]
-		decVal, _ := strconv.ParseInt(dec, 10, 64)
+		decVal, err := strconv.ParseInt(dec, 10, 64)
+		if err != nil {
+			return 0, fmt.Errorf("invalid decimal part %q: %w", dec, err)
+		}
 		result += decVal
 	}
 
-	return result
+	return result, nil
 }

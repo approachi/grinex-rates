@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParsePrice_ShouldConvertDecimalToMinorUnits_WhenDecimalString(t *testing.T) {
@@ -21,7 +22,20 @@ func TestParsePrice_ShouldConvertDecimalToMinorUnits_WhenDecimalString(t *testin
 
 	for _, tt := range tests {
 		t.Run(tt.input, func(t *testing.T) {
-			assert.Equal(t, tt.expected, parsePrice(tt.input))
+			got, err := parsePrice(tt.input)
+			require.NoError(t, err)
+			assert.Equal(t, tt.expected, got)
+		})
+	}
+}
+
+func TestParsePrice_ShouldReturnError_WhenInvalidString(t *testing.T) {
+	tests := []string{"abc", "12.ab", ""}
+
+	for _, input := range tests {
+		t.Run(input, func(t *testing.T) {
+			_, err := parsePrice(input)
+			assert.Error(t, err)
 		})
 	}
 }

@@ -90,7 +90,7 @@ func Load() (*Config, error) {
 	}
 
 	if err := validate(&cfg); err != nil {
-		panic(fmt.Sprintf("config: %s", err))
+		return nil, fmt.Errorf("config: %w", err)
 	}
 
 	return &cfg, nil
