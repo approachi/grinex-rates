@@ -1,0 +1,22 @@
+grpc:
+  port: 50051
+
+exchange:
+  timeoutseconds: 10
+
+postgres:
+  host: localhost
+  port: 5432
+  user: postgres
+  password: postgres
+  database: grinex
+  sslmode: disable
+
+metrics:
+  port: 8080
+
+tracing:
+  endpoint: http://localhost:4318/v1/traces
+
+log:
+  level: info
