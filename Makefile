@@ -37,7 +37,7 @@ db-conn:
 
 .PHONY: lint
 lint:
-	golangci-lint run ./...
+	docker run --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run ./...
 
 .PHONY: proto
 proto:

@@ -29,7 +29,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to init logger: %v", err)
 	}
-	defer zapLogger.Sync()
+	defer func() { _ = zapLogger.Sync() }()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -38,7 +38,7 @@ func main() {
 	if err != nil {
 		zapLogger.Warn("failed to init tracer, tracing disabled", zap.Error(err))
 	} else {
-		defer tp.Shutdown(ctx)
+		defer func() { _ = tp.Shutdown(ctx) }()
 	}
 
 	metrics.Register()
