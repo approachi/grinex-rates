@@ -2,10 +2,6 @@
 build:
 	go build -o bin/server ./cmd/server
 
-.PHONY: test-unit
-test-unit:
-	go test -count=1 ./internal/... -v
-
 .PHONY: test-integration
 test-integration:
 	docker-compose -f docker-compose.test.yml up -d
@@ -14,10 +10,11 @@ test-integration:
 	docker-compose -f docker-compose.test.yml down
 
 .PHONY: test
-test: test-unit
+test:
+	go test -count=1 ./internal/... -v
 
 .PHONY: ftest
-ftest: test-unit test-integration
+ftest: test test-integration
 
 .PHONY: docker-build
 docker-build:
