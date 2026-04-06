@@ -19,8 +19,7 @@ func RecordError(span trace.Span, err error) {
 
 func NewTracerProvider(ctx context.Context, endpoint string) (*sdktrace.TracerProvider, error) {
 	exporter, err := otlptracehttp.New(ctx,
-		otlptracehttp.WithEndpoint(endpoint),
-		otlptracehttp.WithInsecure(),
+		otlptracehttp.WithEndpointURL(endpoint),
 	)
 	if err != nil {
 		return nil, err

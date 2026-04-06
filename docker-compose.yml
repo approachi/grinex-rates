@@ -31,7 +31,7 @@ services:
     command: ["./server"]
     environment:
       APP_POSTGRES_HOST: postgres
-      APP_TRACING_ENDPOINT: jaeger:4318
+      APP_TRACING_ENDPOINT: http://jaeger:4318/v1/traces
     ports:
       - "50051:50051"
     depends_on:
