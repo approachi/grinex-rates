@@ -14,7 +14,10 @@ test-integration:
 	docker-compose -f docker-compose.test.yml down
 
 .PHONY: test
-test: test-unit test-integration
+test: test-unit
+
+.PHONY: ftest
+ftest: test-unit test-integration
 
 .PHONY: docker-build
 docker-build:
